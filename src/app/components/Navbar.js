@@ -13,7 +13,7 @@ export default function NavBar() {
                     SciAstra
                 </Typography>
                 <Button color="inherit">
-                    <Link href="/Blog" style={{ color: '#fff', textDecoration: 'none' }}>Home</Link>
+                    <Link href="/" style={{ color: '#fff', textDecoration: 'none' }}>Home</Link>
                 </Button>
                 <Button color="inherit">
                     <Link href="/admin" style={{ color: '#fff', textDecoration: 'none' }}>admin</Link>
