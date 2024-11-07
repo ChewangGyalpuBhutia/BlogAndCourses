@@ -1,3 +1,4 @@
+
 "use client"
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -5,7 +6,10 @@ import { Container, Typography, Card, CardContent, Grid, Box, Button } from '@mu
 import Image from 'next/image';
 import NavBar from './components/NavBar';
 import { loadStripe } from '@stripe/stripe-js';
-import { toast } from 'react-toastify';
+import { ClipLoader } from 'react-spinners';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 export default function Home() {
   const [blogs, setBlogs] = useState([]);
@@ -14,7 +18,11 @@ export default function Home() {
 
   useEffect(() => {
     axios.get('http://127.0.0.1:8000/api/blog')
-      .then(response => setBlogs(response.data))
+      .then(response => {
+        const currentDate = new Date();
+        const filteredBlogs = response.data.filter(blog => new Date(blog.publish_time) < currentDate);
+        setBlogs(filteredBlogs);
+      })
       .catch(error => console.error(error));
 
     axios.get('http://127.0.0.1:8000/api/courses')
@@ -53,13 +61,13 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-100 min-h-screen relative">
       <NavBar />
       <Container maxWidth="lg" className="mt-10">
         <Typography variant="h4" className="text-center mb-6" style={{ color: '#333' }}>
           Blog Posts
         </Typography>
-        <Grid container spacing={4}>
+        <Grid container spacing={4} className='mt-5'>
           {blogs.map(blog => (
             <Grid item key={blog.id} xs={12} sm={6} md={4}>
               <Card className="h-full">
@@ -88,7 +96,7 @@ export default function Home() {
           ))}
         </Grid>
         <Typography variant="h4" className="text-center mt-10 mb-6" style={{ color: '#333' }}>
-          Courses
+          Browse and Subscribe to Courses
         </Typography>
         <Grid container spacing={4}>
           {courses.map(course => (
@@ -109,17 +117,23 @@ export default function Home() {
                       Discount: {course.discount}%
                     </Typography>
                   </Box>
-                  {/* <Box mt={2} className="text-center"> */}
                   <Button variant="contained" color="primary" onClick={() => makePayment(course.id)} disabled={loading}>
                     {loading ? 'Processing...' : 'Subscribe'}
                   </Button>
-                  {/* </Box> */}
                 </CardContent>
               </Card>
             </Grid>
           ))}
         </Grid>
       </Container>
+
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <ClipLoader color="#00BFFF" loading={loading} size={80} />
+        </div>
+      )}
+
+      <ToastContainer />
     </div>
   );
 }
